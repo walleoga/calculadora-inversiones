@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Simulador de Inversión Pro</title>
+  <title>Simulador de Inversión</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -12,45 +12,61 @@
     <div class="card">
       <h2>Simulador de Inversión</h2>
       
-      <!-- Capital Inicial -->
+      <div class="currency-toggle">
+        <button type="button" class="btn-curr active" id="btn-usd" onclick="setCurrency('USD')">Dólares (USD)</button>
+        <button type="button" class="btn-curr" id="btn-ars" onclick="setCurrency('ARS')">Pesos (ARS)</button>
+      </div>
+
       <div class="input-group">
-        <label for="initial">Capital Inicial (USD): <span id="val-initial" class="badge">$0</span></label>
+        <label for="initial">Capital Inicial: <span id="val-initial" class="badge">$0 USD</span></label>
         <input type="range" id="initial" min="0" max="50000" step="500" value="0" oninput="actualizar()">
       </div>
 
       <div class="input-group">
-        <label for="monthly">Aporte Mensual (USD): <span id="val-monthly" class="badge">$1,000</span></label>
-        <input type="range" id="monthly" min="50" max="10000" step="50" value="1000" oninput="actualizar()">
+        <label for="monthly">Aporte Mensual: <span id="val-monthly" class="badge">$1,000 USD</span></label>
+        <input type="range" id="monthly" min="0" max="10000" step="50" value="1000" oninput="actualizar()">
       </div>
 
       <div class="input-group">
-        <label>Rendimiento Anual Estimado (%):</label>
-        <div class="preset-buttons">
-          <button type="button" class="btn-preset active" id="btn-sp" onclick="setPreset(8, this)">S&P 500 (8%)</button>
-          <button type="button" class="btn-preset" id="btn-qqq" onclick="setPreset(12, this)">QQQ (12%)</button>
+        <label>Instrumento / Rendimiento Estimado:</label>
+        <div class="preset-grid" id="preset-container">
+          <button type="button" class="btn-preset is-ars" id="btn-wallet" onclick="selectPreset(18, 'ARS', 'Billeteras (Naranja X / MP)', 'Rendimiento diario automático con plata disponible en el acto.', 'Bajo', this)">Billeteras / NX / MP (18% ARS)</button>
+          <button type="button" class="btn-preset is-ars" id="btn-cocos" onclick="selectPreset(26, 'ARS', 'Cocos Plazo / PF', 'Tasa fija asegurada dejando el dinero invertido a plazo (ej. 42 días).', 'Bajo', this)">Cocos Plazo / PF (26% ARS)</button>
+
+          <button type="button" class="btn-preset is-usd" id="btn-fcid" onclick="selectPreset(5, 'USD', 'FCI Dólar Ahorro', 'Fondo conservador de bajo riesgo para generar una renta mínima en dólares.', 'Bajo', this)">FCI Dólar (5% USD)</button>
+          <button type="button" class="btn-preset is-usd" id="btn-on" onclick="selectPreset(7.5, 'USD', 'Obligaciones Negociables (ONs)', 'Préstamos a empresas líderes (YPF, Pampa) que pagan intereses periódicos en dólares.', 'Moderado - Bajo', this)">ONs Dólar (7.5% USD)</button>
+          <button type="button" class="btn-preset is-usd active" id="btn-sp" onclick="selectPreset(8, 'USD', 'S&P 500 (SPY)', 'Inversión en las 500 empresas más grandes y sólidas de EE.UU. a largo plazo.', 'Moderado', this)">S&P 500 (8% USD)</button>
+          <button type="button" class="btn-preset is-usd" id="btn-qqq" onclick="selectPreset(12, 'USD', 'QQQ Tech (Nasdaq)', 'Inversión enfocada en las principales tecnológicas del mundo (Apple, Microsoft, Nvidia).', 'Alto', this)">QQQ Tech (12% USD)</button>
         </div>
-        <input type="range" id="rate" min="1" max="25" step="0.5" value="8" oninput="syncRateSlider()">
-        <div class="rate-indicator"><span id="val-rate">8%</span> anual</div>
+        
+        <input type="range" id="rate" min="1" max="50" step="0.5" value="8" oninput="syncRateSlider()">
+        <div class="rate-indicator"><span id="val-rate">8%</span> anual estimado</div>
+      </div>
+
+      <div class="info-card" id="info-card">
+        <div class="info-title" id="info-title">S&P 500 (SPY)</div>
+        <div class="info-desc" id="info-desc">Inversión en las 500 empresas más grandes y sólidas de EE.UU. a largo plazo.</div>
+        <div class="info-risk">Riesgo estimado: <span id="info-risk-val" class="risk-badge">Moderado</span></div>
       </div>
 
       <div class="input-group">
-        <label for="years">Años a Invertir: <span id="val-years" class="badge">5 años</span></label>
-        <input type="range" id="years" min="1" max="35" step="1" value="5" oninput="actualizar()">
+        <label for="years">Plazo de Inversión: <span id="val-years" class="badge">5 años</span></label>
+        <input type="range" id="years" min="1" max="30" step="1" value="5" oninput="actualizar()">
       </div>
 
       <div class="result-box">
         <div class="stat">
           <span class="stat-label">Capital Aportado:</span>
-          <span id="out-capital" class="stat-val">$0 USD</span>
+          <span id="out-capital" class="stat-val">$0</span>
         </div>
         <div class="stat">
           <span class="stat-label">Ganancia por Intereses:</span>
-          <span id="out-ganancia" class="stat-val profit">+$0 USD</span>
+          <span id="out-ganancia" class="stat-val profit">+$0</span>
         </div>
         <hr>
         <div class="stat total-row">
           <span class="stat-label">Total Acumulado:</span>
-          <span id="out-total" class="stat-val total">$0 USD</span>
+          <span id="out-total" class="stat-val total">$0</span>
         </div>
       </div>
 

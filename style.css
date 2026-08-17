@@ -17,17 +17,17 @@ body {
 
 .container {
   width: 100%;
-  max-width: 520px;
+  max-width: 540px;
 }
 
 .card {
   background-color: #16203c;
-  padding: 26px;
+  padding: 24px;
   border-radius: 18px;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   border: 1px solid #1e294f;
 }
 
@@ -36,6 +36,32 @@ h2 {
   font-size: 22px;
   color: #38bdf8;
   letter-spacing: -0.5px;
+}
+
+.currency-toggle {
+  display: flex;
+  gap: 8px;
+  background: #0f172a;
+  padding: 4px;
+  border-radius: 10px;
+}
+
+.btn-curr {
+  flex: 1;
+  padding: 8px;
+  font-size: 13px;
+  font-weight: bold;
+  background: transparent;
+  color: #94a3b8;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-curr.active {
+  background: #0284c7;
+  color: #fff;
 }
 
 .input-group {
@@ -68,16 +94,16 @@ input[type="range"] {
   cursor: pointer;
 }
 
-.preset-buttons {
-  display: flex;
+.preset-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .btn-preset {
-  flex: 1;
-  padding: 8px;
-  font-size: 12px;
+  padding: 8px 6px;
+  font-size: 11px;
   font-weight: 600;
   background-color: #1e294f;
   color: #cbd5e1;
@@ -85,6 +111,7 @@ input[type="range"] {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
+  text-align: center;
 }
 
 .btn-preset.active {
@@ -99,20 +126,54 @@ input[type="range"] {
   text-align: right;
 }
 
+/* Tarjeta explicativa */
+.info-card {
+  background-color: #0f172a;
+  border-left: 4px solid #38bdf8;
+  padding: 12px 14px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.info-title {
+  font-size: 13px;
+  font-weight: bold;
+  color: #38bdf8;
+}
+
+.info-desc {
+  font-size: 12px;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+.info-risk {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.risk-badge {
+  color: #f59e0b;
+  font-weight: bold;
+}
+
 .result-box {
   background-color: #0f172a;
-  padding: 16px;
+  padding: 14px;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   border: 1px solid #1e294f;
 }
 
 .stat {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .stat-label {
@@ -139,27 +200,27 @@ hr {
 }
 
 .total {
-  font-size: 18px;
+  font-size: 17px;
   color: #38bdf8;
   font-weight: bold;
 }
 
 .chart-wrapper {
-  margin-top: 8px;
-  height: 220px;
+  margin-top: 4px;
+  height: 210px;
 }
 
 .table-accordion summary {
   cursor: pointer;
   font-size: 13px;
   color: #38bdf8;
-  margin-top: 8px;
+  margin-top: 6px;
   font-weight: 600;
   outline: none;
 }
 
 .table-container {
-  max-height: 200px;
+  max-height: 180px;
   overflow-y: auto;
   margin-top: 10px;
   border-radius: 8px;
@@ -169,12 +230,12 @@ hr {
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 11px;
   text-align: right;
 }
 
 th, td {
-  padding: 8px 10px;
+  padding: 6px 8px;
   border-bottom: 1px solid #1e294f;
 }
 
