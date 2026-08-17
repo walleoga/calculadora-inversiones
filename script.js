@@ -1,5 +1,6 @@
 function setRate(value) {
   document.getElementById('rate').value = value;
+  calcular(); 
 }
 
 function calcular() {
@@ -15,18 +16,14 @@ function calcular() {
   const r = (annualRate / 100) / 12;
   const n = years * 12;
 
-  // Total aportado de bolsillo
   const capitalAportado = p * n;
 
-  // Fórmula de valor futuro con aportes mensuales (anualidad)
   const totalFinal = p * ((Math.pow(1 + r, n) - 1) / r);
   const gananciaInteres = totalFinal - capitalAportado;
 
-  // Mostrar resultados formateados
   document.getElementById('out-capital').innerText = `$${Math.round(capitalAportado).toLocaleString('en-US')} USD`;
   document.getElementById('out-ganancia').innerText = `+$${Math.round(gananciaInteres).toLocaleString('en-US')} USD`;
   document.getElementById('out-total').innerText = `$${Math.round(totalFinal).toLocaleString('en-US')} USD`;
 }
 
-// Ejecuta el cálculo inicial al cargar la página
 window.onload = calcular;
