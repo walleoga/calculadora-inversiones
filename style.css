@@ -88,10 +88,19 @@ label {
   font-size: 12px;
 }
 
+.inflation-badge {
+  color: #ef4444;
+  background: #450a0a;
+}
+
 input[type="range"] {
   width: 100%;
   accent-color: #38bdf8;
   cursor: pointer;
+}
+
+input[type="range"]#inflation {
+  accent-color: #ef4444;
 }
 
 .preset-grid {
@@ -121,12 +130,11 @@ input[type="range"] {
 }
 
 .rate-indicator {
-  font-size: 12px;
+  font-size: 11px;
   color: #64748b;
   text-align: right;
 }
 
-/* Tarjeta explicativa */
 .info-card {
   background-color: #0f172a;
   border-left: 4px solid #38bdf8;
@@ -200,52 +208,12 @@ hr {
 }
 
 .total {
-  font-size: 17px;
+  font-size: 15px;
   color: #38bdf8;
   font-weight: bold;
 }
 
 .chart-wrapper {
   margin-top: 4px;
-  height: 210px;
-}
-
-.table-accordion summary {
-  cursor: pointer;
-  font-size: 13px;
-  color: #38bdf8;
-  margin-top: 6px;
-  font-weight: 600;
-  outline: none;
-}
-
-.table-container {
-  max-height: 180px;
-  overflow-y: auto;
-  margin-top: 10px;
-  border-radius: 8px;
-  border: 1px solid #1e294f;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 11px;
-  text-align: right;
-}
-
-th, td {
-  padding: 6px 8px;
-  border-bottom: 1px solid #1e294f;
-}
-
-th {
-  background-color: #0f172a;
-  color: #94a3b8;
-  position: sticky;
-  top: 0;
-}
-
-td:first-child, th:first-child {
-  text-align: center;
+  height: 220px;
 }

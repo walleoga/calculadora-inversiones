@@ -9,6 +9,7 @@ function setCurrency(curr) {
   const initialInput = document.getElementById('initial');
   const monthlyInput = document.getElementById('monthly');
   const rateInput = document.getElementById('rate');
+  const inflationInput = document.getElementById('inflation');
 
   if (curr === 'ARS') {
     initialInput.min = "0";
@@ -21,7 +22,12 @@ function setCurrency(curr) {
     monthlyInput.step = "25000";
     monthlyInput.value = "100000";
 
-    rateInput.max = "40";
+    rateInput.max = "80";
+    
+    // Inflación ARS (configurada para la realidad argentina actual)
+    inflationInput.max = "100";
+    inflationInput.step = "1";
+    inflationInput.value = "30"; 
 
     const activePreset = document.querySelector('.btn-preset.active');
     if (!activePreset || !activePreset.classList.contains('is-ars')) {
@@ -41,6 +47,11 @@ function setCurrency(curr) {
 
     rateInput.max = "25";
 
+    // Inflación USD (configurada para inflación de EE.UU.)
+    inflationInput.max = "10";
+    inflationInput.step = "0.5";
+    inflationInput.value = "3"; 
+
     const activePreset = document.querySelector('.btn-preset.active');
     if (!activePreset || !activePreset.classList.contains('is-usd')) {
       document.getElementById('btn-sp').click();
@@ -53,39 +64,8 @@ function setCurrency(curr) {
 
 function selectPreset(rate, curr, title, desc, risk, btn) {
   if (currentCurrency !== curr) {
-    currentCurrency = curr;
-    document.getElementById('btn-usd').classList.toggle('active', curr === 'USD');
-    document.getElementById('btn-ars').classList.toggle('active', curr === 'ARS');
-    
-    const initialInput = document.getElementById('initial');
-    const monthlyInput = document.getElementById('monthly');
-    const rateInput = document.getElementById('rate');
-
-    if (curr === 'ARS') {
-      initialInput.min = "0";
-      initialInput.max = "5000000";
-      initialInput.step = "50000";
-      initialInput.value = "0";
-
-      monthlyInput.min = "50000";
-      monthlyInput.max = "1000000";
-      monthlyInput.step = "25000";
-      monthlyInput.value = "100000";
-      rateInput.max = "40";
-    } else {
-      initialInput.min = "0";
-      initialInput.max = "50000";
-      initialInput.step = "500";
-      initialInput.value = "0";
-
-      monthlyInput.min = "50";
-      monthlyInput.max = "10000";
-      monthlyInput.step = "50";
-      monthlyInput.value = "1000";
-      rateInput.max = "25";
-    }
+    setCurrency(curr);
   }
-
   document.getElementById('rate').value = rate;
   document.querySelectorAll('.btn-preset').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
@@ -113,19 +93,20 @@ function actualizar() {
   const initial = parseFloat(document.getElementById('initial').value) || 0;
   const monthly = parseFloat(document.getElementById('monthly').value) || 0;
   const annualRate = parseFloat(document.getElementById('rate').value) || 0;
+  const inflationRate = parseFloat(document.getElementById('inflation').value) || 0;
   const years = parseInt(document.getElementById('years').value) || 1;
 
-  // Actualizar badges
   document.getElementById('val-initial').innerText = formatMoney(initial);
   document.getElementById('val-monthly').innerText = formatMoney(monthly);
   document.getElementById('val-rate').innerText = `${annualRate}%`;
+  document.getElementById('val-inflation').innerText = `${inflationRate}% anual`;
   document.getElementById('val-years').innerText = `${years} año${years > 1 ? 's' : ''}`;
 
   const r = (annualRate / 100) / 12;
   const labels = [];
   const capitalData = [];
   const interestData = [];
-  const tableRows = [];
+  const realPurchasingPowerData = [];
 
   let currentBalance = initial;
   let totalInvested = initial;
@@ -137,33 +118,26 @@ function actualizar() {
     }
 
     const interestEarned = Math.max(0, currentBalance - totalInvested);
+    
+    // Calcula el poder de compra real descontando la inflación acumulada de esos años
+    const realBalance = currentBalance / Math.pow(1 + (inflationRate / 100), year);
 
     labels.push(`Año ${year}`);
     capitalData.push(Math.round(totalInvested));
     interestData.push(Math.round(interestEarned));
-
-    tableRows.push(`
-      <tr>
-        <td>${year}</td>
-        <td>${formatMoney(totalInvested)}</td>
-        <td style="color:#4ade80">+${formatMoney(interestEarned)}</td>
-        <td style="color:#38bdf8; font-weight:bold">${formatMoney(currentBalance)}</td>
-      </tr>
-    `);
+    realPurchasingPowerData.push(Math.round(realBalance));
   }
 
-  const finalInterest = Math.max(0, currentBalance - totalInvested);
+  const finalRealBalance = currentBalance / Math.pow(1 + (inflationRate / 100), years);
 
   document.getElementById('out-capital').innerText = formatMoney(totalInvested);
-  document.getElementById('out-ganancia').innerText = `+${formatMoney(finalInterest)}`;
   document.getElementById('out-total').innerText = formatMoney(currentBalance);
+  document.getElementById('out-real').innerText = formatMoney(finalRealBalance);
 
-  document.getElementById('breakdown-body').innerHTML = tableRows.join('');
-
-  renderChart(labels, capitalData, interestData);
+  renderChart(labels, capitalData, interestData, realPurchasingPowerData);
 }
 
-function renderChart(labels, capitalData, interestData) {
+function renderChart(labels, capitalData, interestData, realData) {
   const canvas = document.getElementById('growthChart');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
@@ -178,15 +152,30 @@ function renderChart(labels, capitalData, interestData) {
       labels: labels,
       datasets: [
         {
+          type: 'line',
+          label: 'Poder de Compra Real',
+          data: realData,
+          borderColor: '#fbbf24',
+          backgroundColor: '#fbbf24',
+          borderWidth: 3,
+          pointRadius: 4,
+          fill: false,
+          tension: 0.3
+        },
+        {
+          type: 'bar',
           label: 'Capital Aportado',
           data: capitalData,
           backgroundColor: '#0284c7',
+          stack: 'combined',
           borderRadius: 4
         },
         {
-          label: 'Ganancia por Interés',
+          type: 'bar',
+          label: 'Interés Nominal',
           data: interestData,
           backgroundColor: '#4ade80',
+          stack: 'combined',
           borderRadius: 4
         }
       ]
@@ -201,7 +190,7 @@ function renderChart(labels, capitalData, interestData) {
       plugins: {
         legend: {
           position: 'top',
-          labels: { color: '#94a3b8', boxWidth: 12, font: { size: 11 } }
+          labels: { color: '#94a3b8', boxWidth: 12, font: { size: 10 } }
         },
         tooltip: {
           callbacks: {

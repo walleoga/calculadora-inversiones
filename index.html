@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Simulador de Inversión</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=3">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -30,23 +30,28 @@
       <div class="input-group">
         <label>Instrumento / Rendimiento Estimado:</label>
         <div class="preset-grid" id="preset-container">
-          <button type="button" class="btn-preset is-ars" id="btn-wallet" onclick="selectPreset(18, 'ARS', 'Billeteras (Naranja X / MP)', 'Rendimiento diario automático con plata disponible en el acto.', 'Bajo', this)">Billeteras / NX / MP (18% ARS)</button>
-          <button type="button" class="btn-preset is-ars" id="btn-cocos" onclick="selectPreset(26, 'ARS', 'Cocos Plazo / PF', 'Tasa fija asegurada dejando el dinero invertido a plazo (ej. 42 días).', 'Bajo', this)">Cocos Plazo / PF (26% ARS)</button>
+          <button type="button" class="btn-preset is-ars" id="btn-wallet" onclick="selectPreset(18, 'ARS', 'Billeteras (Naranja X / MP)', 'Rendimiento diario automático con plata disponible en el acto.', 'Bajo', this)">Billeteras (18% ARS)</button>
+          <button type="button" class="btn-preset is-ars" id="btn-cocos" onclick="selectPreset(26, 'ARS', 'Cocos Plazo / PF', 'Tasa fija asegurada dejando el dinero invertido a plazo (ej. 42 días).', 'Bajo', this)">Plazo / PF (26% ARS)</button>
 
           <button type="button" class="btn-preset is-usd" id="btn-fcid" onclick="selectPreset(5, 'USD', 'FCI Dólar Ahorro', 'Fondo conservador de bajo riesgo para generar una renta mínima en dólares.', 'Bajo', this)">FCI Dólar (5% USD)</button>
-          <button type="button" class="btn-preset is-usd" id="btn-on" onclick="selectPreset(7.5, 'USD', 'Obligaciones Negociables (ONs)', 'Préstamos a empresas líderes (YPF, Pampa) que pagan intereses periódicos en dólares.', 'Moderado - Bajo', this)">ONs Dólar (7.5% USD)</button>
-          <button type="button" class="btn-preset is-usd active" id="btn-sp" onclick="selectPreset(8, 'USD', 'S&P 500 (SPY)', 'Inversión en las 500 empresas más grandes y sólidas de EE.UU. a largo plazo.', 'Moderado', this)">S&P 500 (8% USD)</button>
-          <button type="button" class="btn-preset is-usd" id="btn-qqq" onclick="selectPreset(12, 'USD', 'QQQ Tech (Nasdaq)', 'Inversión enfocada en las principales tecnológicas del mundo (Apple, Microsoft, Nvidia).', 'Alto', this)">QQQ Tech (12% USD)</button>
+          <button type="button" class="btn-preset is-usd" id="btn-on" onclick="selectPreset(7.5, 'USD', 'Obligaciones Negociables (ONs)', 'Préstamos a empresas líderes (YPF, Pampa) que pagan intereses periódicos en dólares.', 'Moderado', this)">ONs Dólar (7.5% USD)</button>
+          <button type="button" class="btn-preset is-usd active" id="btn-sp" onclick="selectPreset(8, 'USD', 'S&P 500 (SPY)', 'Inversión en las 500 empresas más grandes de EE.UU. a largo plazo.', 'Moderado', this)">S&P 500 (8% USD)</button>
+          <button type="button" class="btn-preset is-usd" id="btn-qqq" onclick="selectPreset(12, 'USD', 'QQQ Tech (Nasdaq)', 'Inversión enfocada en las principales tecnológicas del mundo.', 'Alto', this)">QQQ Tech (12% USD)</button>
         </div>
-        
         <input type="range" id="rate" min="1" max="50" step="0.5" value="8" oninput="syncRateSlider()">
-        <div class="rate-indicator"><span id="val-rate">8%</span> anual estimado</div>
+        <div class="rate-indicator"><span id="val-rate">8%</span> de rendimiento anual</div>
       </div>
 
       <div class="info-card" id="info-card">
         <div class="info-title" id="info-title">S&P 500 (SPY)</div>
-        <div class="info-desc" id="info-desc">Inversión en las 500 empresas más grandes y sólidas de EE.UU. a largo plazo.</div>
-        <div class="info-risk">Riesgo estimado: <span id="info-risk-val" class="risk-badge">Moderado</span></div>
+        <div class="info-desc" id="info-desc">Inversión en las 500 empresas más grandes de EE.UU. a largo plazo.</div>
+        <div class="info-risk">Riesgo: <span id="info-risk-val" class="risk-badge">Moderado</span></div>
+      </div>
+
+      <div class="input-group">
+        <label for="inflation">Inflación Anual Estimada: <span id="val-inflation" class="badge inflation-badge">3% anual</span></label>
+        <input type="range" id="inflation" min="0" max="20" step="0.5" value="3" oninput="actualizar()">
+        <div class="rate-indicator" style="color: #fca5a5;">Descuenta la pérdida de valor del dinero</div>
       </div>
 
       <div class="input-group">
@@ -60,41 +65,24 @@
           <span id="out-capital" class="stat-val">$0</span>
         </div>
         <div class="stat">
-          <span class="stat-label">Ganancia por Intereses:</span>
-          <span id="out-ganancia" class="stat-val profit">+$0</span>
+          <span class="stat-label">Total Nominal (Con intereses):</span>
+          <span id="out-total" class="stat-val total">$0</span>
         </div>
         <hr>
         <div class="stat total-row">
-          <span class="stat-label">Total Acumulado:</span>
-          <span id="out-total" class="stat-val total">$0</span>
+          <span class="stat-label" style="color: #f8fafc;">Poder de Compra Real:</span>
+          <span id="out-real" class="stat-val" style="color: #fbbf24; font-size: 17px;">$0</span>
         </div>
+        <div style="font-size: 10px; color: #94a3b8; text-align: right; margin-top: 2px;">(Total ajustado por inflación)</div>
       </div>
 
       <div class="chart-wrapper">
         <canvas id="growthChart"></canvas>
       </div>
 
-      <details class="table-accordion">
-        <summary>Ver desglose año por año</summary>
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Año</th>
-                <th>Capital Aportado</th>
-                <th>Interés Ganado</th>
-                <th>Total Acumulado</th>
-              </tr>
-            </thead>
-            <tbody id="breakdown-body">
-            </tbody>
-          </table>
-        </div>
-      </details>
-
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=3"></script>
 </body>
 </html>
